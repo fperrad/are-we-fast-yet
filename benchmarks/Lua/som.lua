@@ -43,9 +43,6 @@ function Vector.with (elem)
 end
 
 function Vector:at (idx)
-    if idx > self.storage.n then
-        return nil
-    end
     return self.storage[idx]
 end
 
