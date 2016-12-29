@@ -50,26 +50,29 @@ function Vector:at (idx)
 end
 
 function Vector:at_put (idx, val)
-    if idx > self.storage.n then
-        local new_n = self.storage.n
+    local storage = self.storage
+    if idx > storage.n then
+        local new_n = storage.n
         while idx > new_n do
             new_n = new_n * 2
         end
-        self.storage.n = new_n
+        storage.n = new_n
     end
-    self.storage[idx] = val
+    storage[idx] = val
     if self.last_idx < idx + 1 then
         self.last_idx = idx + 1
     end
 end
 
 function Vector:append (elem)
-    if self.last_idx > self.storage.n then
+    local last_idx = self.last_idx
+    local storage = self.storage
+    if last_idx > storage.n then
         -- Need to expand capacity first
-        self.storage.n = 2 * self.storage.n
+        storage.n = 2 * storage.n
     end
-    self.storage[self.last_idx] = elem
-    self.last_idx = self.last_idx + 1
+    storage[last_idx] = elem
+    self.last_idx = last_idx + 1
 end
 
 function Vector:is_empty ()
@@ -78,8 +81,9 @@ end
 
 function Vector:each ()
     local i = self.first_idx
+    local last_idx = self.last_idx
     local function iter ()
-        if i < self.last_idx then
+        if i < last_idx then
             local val = self.storage[i]
             i = i + 1
             return val
@@ -91,8 +95,9 @@ function Vector:each ()
 end
 
 function Vector:has_some (fn)
+    local storage = self.storage
     for i = self.first_idx, self.last_idx - 1 do
-        if fn(self.storage[i]) then
+        if fn(storage[i]) then
             return true
         end
     end
@@ -100,8 +105,9 @@ function Vector:has_some (fn)
 end
 
 function Vector:get_one (fn)
+    local storage = self.storage
     for i = self.first_idx, self.last_idx - 1 do
-        local e = self.storage[i]
+        local e = storage[i]
         if fn(e) then
             return e
         end
@@ -113,8 +119,9 @@ function Vector:remove_first ()
     if self:is_empty() then
         return nil
     end
-    self.first_idx = self.first_idx + 1
-    return self.storage[self.first_idx - 1]
+    local first_idx = self.first_idx
+    self.first_idx = first_idx + 1
+    return self.storage[first_idx]
 end
 
 function Vector:remove (obj)
