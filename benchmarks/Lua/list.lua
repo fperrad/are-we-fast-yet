@@ -40,24 +40,17 @@ end -- class Element
 local list = {} do
 setmetatable(list, {__index = require'benchmark'})
 
-function list:benchmark ()
-    local result = self:tail(self:make_list(15),
-                             self:make_list(10),
-                             self:make_list(6))
-    return result:length()
-end
-
-function list:make_list (length)
+local function make_list (length)
     if length == 0 then
         return nil
     else
         local e = Element.new(length)
-        e.next = self:make_list(length - 1)
+        e.next = make_list(length - 1)
         return e
     end
 end
 
-function list:is_shorter_than (x, y)
+local function is_shorter_than (x, y)
     local x_tail, y_tail = x, y
     while y_tail do
         if not x_tail then
@@ -69,14 +62,21 @@ function list:is_shorter_than (x, y)
     return false
 end
 
-function list:tail (x, y, z)
-    if self:is_shorter_than(y, x) then
-        return self:tail(self:tail(x.next, y, z),
-                         self:tail(y.next, z, x),
-                         self:tail(z.next, x, y))
+local function tail (x, y, z)
+    if is_shorter_than(y, x) then
+        return tail(tail(x.next, y, z),
+                    tail(y.next, z, x),
+                    tail(z.next, x, y))
     else
         return z
     end
+end
+
+function list:benchmark ()
+    local result = tail(make_list(15),
+                        make_list(10),
+                        make_list(6))
+    return result:length()
 end
 
 function list:verify_result (result)
