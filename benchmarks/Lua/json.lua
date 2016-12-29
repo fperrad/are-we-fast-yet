@@ -406,14 +406,16 @@ end
 function Parser:read_string_internal ()
     self:read()
     self:start_capture()
-    while self.current ~= '"' do
-        if self.current == '\\' then
+    local current = self.current
+    while current ~= '"' do
+        if current == '\\' then
             self:pause_capture()
             self:read_escape()
             self:start_capture()
         else
             self:read()
         end
+        current = self.current
     end
     local str = self:end_capture()
     self:read()
