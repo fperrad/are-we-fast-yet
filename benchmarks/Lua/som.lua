@@ -20,16 +20,15 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-local INITIAL_SIZE = 10
 local INITIAL_CAPACITY = 16
 
 local Vector = {_CLASS = 'Vector'} do
 
 local floor = math.floor
 
-function Vector.new (size)
+function Vector.new ()
     local obj = {
-        storage   = {n = size or 50},
+        storage   = {},
         first_idx = 1,
         last_idx  = 1,
     }
@@ -37,7 +36,7 @@ function Vector.new (size)
 end
 
 function Vector.with (elem)
-    local v = Vector.new(1)
+    local v = Vector.new()
     v:append(elem)
     return v
 end
@@ -48,13 +47,6 @@ end
 
 function Vector:at_put (idx, val)
     local storage = self.storage
-    if idx > storage.n then
-        local new_n = storage.n
-        while idx > new_n do
-            new_n = new_n * 2
-        end
-        storage.n = new_n
-    end
     storage[idx] = val
     if self.last_idx < idx + 1 then
         self.last_idx = idx + 1
@@ -64,10 +56,6 @@ end
 function Vector:append (elem)
     local last_idx = self.last_idx
     local storage = self.storage
-    if last_idx > storage.n then
-        -- Need to expand capacity first
-        storage.n = 2 * storage.n
-    end
     storage[last_idx] = elem
     self.last_idx = last_idx + 1
 end
@@ -122,7 +110,7 @@ function Vector:remove_first ()
 end
 
 function Vector:remove (obj)
-    local new_array = {n = self:capacity()}
+    local new_array = {}
     local new_last = 1
     local found = false
     for it in self:each() do
@@ -142,15 +130,11 @@ end
 function Vector:remove_all ()
     self.first_idx = 1
     self.last_idx = 1
-    self.storage = {n = self:capacity()}
+    self.storage = {}
 end
 
 function Vector:size ()
     return self.last_idx - self.first_idx
-end
-
-function Vector:capacity ()
-    return self.storage.n
 end
 
 function Vector:sort (fn)
@@ -245,9 +229,9 @@ end -- class Vector
 
 local Set = {_CLASS = 'Set'} do
 
-function Set.new (size)
+function Set.new ()
     local obj = {
-        items = Vector.new(size or INITIAL_SIZE)
+        items = Vector.new()
     }
     return setmetatable(obj, {__index = Set})
 end
@@ -506,7 +490,7 @@ function Dictionary:remove_all ()
 end
 
 function Dictionary:keys ()
-    local keys = Vector.new(self.size)
+    local keys = Vector.new()
     local buckets = self.buckets
     for i = 1, buckets.n do
         local current = buckets[i]
@@ -519,7 +503,7 @@ function Dictionary:keys ()
 end
 
 function Dictionary:values ()
-    local vals = Vector.new(self.size)
+    local vals = Vector.new()
     local buckets = self.buckets
     for i = 1, buckets.n do
         local current = buckets[i]
@@ -593,7 +577,7 @@ function LuaDictionary:remove_all ()
 end
 
 function LuaDictionary:keys ()
-    local keys = Vector.new(self.size)
+    local keys = Vector.new()
     for k in pairs(self.dict) do
         keys:append(k)
     end
@@ -601,7 +585,7 @@ function LuaDictionary:keys ()
 end
 
 function LuaDictionary:values ()
-    local values = Vector.new(self.size)
+    local values = Vector.new()
     for _, v in pairs(self.dict) do
         values:append(v)
     end
