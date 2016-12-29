@@ -113,12 +113,12 @@ function Vector:get_one (fn)
 end
 
 function Vector:remove_first ()
-    if self:is_empty() then
-        return nil
-    end
     local first_idx = self.first_idx
-    self.first_idx = first_idx + 1
-    return self.storage[first_idx]
+    if self.last_idx ~= first_idx then
+        self.first_idx = first_idx + 1
+        return self.storage[first_idx]
+    end
+    return nil
 end
 
 function Vector:remove (obj)
